@@ -16,32 +16,13 @@ export function ControlPanel({ engineRef, isLoaded }: ControlPanelProps) {
   }
 
   return (
-    <div className={styles.panel}>
-      {/* Badge row */}
-      <div className={styles.badges}>
-        <span className={styles.badge}>Rust</span>
-        <span className={styles.divider}>×</span>
-        <span className={styles.badge}>WebAssembly</span>
-        <span className={styles.divider}>×</span>
-        <span className={styles.badge}>WebGPU</span>
-      </div>
-
-      {/* Speed Up button */}
-      <button
-        id="speed-up-btn"
-        className={styles.btn}
-        onClick={handleSpeedUp}
-        disabled={!isLoaded}
-        aria-label="Increase rotation speed"
-      >
-        <span className={styles.btnIcon}>⚡</span>
-        <span className={styles.btnLabel}>Speed Up</span>
-      </button>
-
-      <p className={styles.hint}>
-        Click to increase rotation speed.<br />
-        Each click adds +0.01 rad/frame.
-      </p>
-    </div>
+    <button
+      id="speed-up-btn"
+      className={styles.btn}
+      onClick={handleSpeedUp}
+      disabled={!isLoaded}
+    >
+      speed up
+    </button>
   );
 }
