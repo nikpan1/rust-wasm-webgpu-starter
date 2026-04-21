@@ -4,7 +4,14 @@ mod state;
 
 use state::State;
 use wasm_bindgen::prelude::*;
+
+#[cfg(target_arch = "wasm32")]
 use web_sys::HtmlCanvasElement;
+
+// Provide a harmless alias on non-wasm targets so the public API keeps the
+// same signatures for IDEs and cross-target analysis.
+#[cfg(not(target_arch = "wasm32"))]
+type HtmlCanvasElement = ();
 
 /// The public Wasm interface.
 ///

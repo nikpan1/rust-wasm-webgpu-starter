@@ -1,6 +1,16 @@
 use wgpu::util::DeviceExt;
+
+#[cfg(target_arch = "wasm32")]
 use web_sys::HtmlCanvasElement;
 
+// Keep the `HtmlCanvasElement` symbol available on non-wasm targets as a
+// harmless alias so signatures can stay the same for IDEs and cross-target
+// analysis (avoids trait bound checks on web-only types).
+#[cfg(not(target_arch = "wasm32"))]
+type HtmlCanvasElement = ();
+
+// Import math and geometry only for the wasm target where they are used
+#[cfg(target_arch = "wasm32")]
 use crate::geometry::{Vertex, INDICES, VERTICES};
 use crate::math;
 
@@ -22,6 +32,8 @@ pub struct State {
     pub rotation_speed: f32,
 }
 
+// WASM-specific implementation that requires `HtmlCanvasElement`.
+#[cfg(target_arch = "wasm32")]
 impl State {
     pub async fn new(canvas: HtmlCanvasElement) -> Result<Self, String> {
         let width  = canvas.width();
@@ -37,6 +49,11 @@ impl State {
         });
 
         // ── Surface from canvas ─────────────────────────────────────────
+        // Create a surface from the web canvas when compiling to wasm32.
+        // On wasm the `Canvas` variant is available and `web_sys::HtmlCanvasElement`
+        // is the expected argument. When not compiling to wasm, return early
+        // so IDEs / native analysis don't require `HasWindowHandle` for
+        // `HtmlCanvasElement` (which is a web-only type).
         let surface = instance
             .create_surface(wgpu::SurfaceTarget::Canvas(canvas))
             .map_err(|e| format!("create_surface: {e}"))?;
@@ -196,7 +213,18 @@ impl State {
             rotation_speed: 0.005,
         })
     }
+}
 
+// Non-wasm stub to keep native analysis and builds happy. This avoids trait bound
+// checks on web-only types like `web_sys::HtmlCanvasElement`.
+#[cfg(not(target_arch = "wasm32"))]
+impl State {
+    pub async fn new(_canvas: ()) -> Result<Self, String> {
+        Err("State::new is only supported on wasm32 target".to_string())
+    }
+}
+
+impl State {
     // ── Helpers ──────────────────────────────────────────────────────────────
 
     fn make_depth_view(
