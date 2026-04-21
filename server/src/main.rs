@@ -30,8 +30,8 @@ async fn main() {
 
     // ── Static file service ───────────────────────────────────────────────
     // ServeDir handles:
-    //   • Correct MIME types (incl. application/wasm for .wasm files)
-    //   • Serving index.html for directory requests
+    // - Correct MIME types (incl. application/wasm for .wasm files)
+    // - Serving index.html for directory requests
     let serve_dir = ServeDir::new(dist).append_index_html_on_directories(true);
 
     let app = Router::new()

@@ -1,0 +1,107 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  # Build the server (native Rust binary)
+  rust-server-build:
+    name: Rust - server build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Cache cargo registry and index
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-registry-
+
+      - name: Build server (release)
+        run: cargo build --manifest-path=server/Cargo.toml --release
+
+  # Build the engine crate for WebAssembly
+  rust-engine-wasm:
+    name: Rust - engine (WASM) build
+    runs-on: ubuntu-latest
+    needs: rust-server-build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Add wasm target
+        run: rustup target add wasm32-unknown-unknown
+
+      - name: Cache cargo (including target)
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-target-${{ hashFiles('**/Cargo.lock','**/Cargo.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-target-
+
+      - name: Install wasm-pack
+        run: cargo install --locked wasm-pack || true
+
+      - name: Build WASM (wasm-pack)
+        working-directory: client
+        run: npm run build:wasm
+
+      - name: Verify wasm artifact exists
+        run: |
+          if [ ! -f ./engine-pkg/package.json ]; then
+            echo "engine-pkg not generated";
+            ls -la
+            exit 1
+          fi
+
+  # Build the frontend client (TypeScript + Vite)
+  client-build:
+    name: Client - build & lint
+    runs-on: ubuntu-latest
+    needs: rust-engine-wasm
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --prefix client
+
+      - name: Build client (includes TypeScript check)
+        run: npm run build --prefix client
+
+      - name: Lint
+        run: npm run lint --prefix client
+
+      - name: List built files
+        run: ls -la client/dist || true
+
