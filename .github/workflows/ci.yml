@@ -72,11 +72,18 @@ jobs:
 
       - name: Verify wasm artifact exists
         run: |
-          if [ ! -f ./engine-pkg/package.json ]; then
-            echo "engine-pkg not generated";
-            ls -la
+          if [ ! -f ./client/engine-pkg/package.json ]; then
+            echo "engine-pkg not generated in client/engine-pkg";
+            ls -la client || true
+            ls -la client/engine-pkg || true
             exit 1
           fi
+
+      - name: Upload wasm pkg artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine-pkg
+          path: client/engine-pkg
 
   # Build the frontend client (TypeScript + Vite)
   client-build:
@@ -87,11 +94,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Download wasm pkg artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: engine-pkg
+          path: client/engine-pkg
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: client/package-lock.json
 
       - name: Install dependencies
         run: npm ci --prefix client
@@ -104,4 +118,3 @@ jobs:
 
       - name: List built files
         run: ls -la client/dist || true
-

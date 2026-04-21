@@ -78,9 +78,9 @@ graph TD
 
 ---
 
-## Demo
+## Preview
 
-![App Preview](docs/preview.png)
+![Preview](docs/demo.png)
 
 ---
 
