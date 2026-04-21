@@ -1,0 +1,124 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 28px 40px;
+  border-radius: 20px;
+  background: rgba(12, 20, 40, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow:
+    0 4px 32px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+/* ── Tech badges ──────────────────────────────────────── */
+.badges {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.badge {
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #c4b5fd;
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.35);
+}
+
+.divider {
+  color: #334155;
+  font-size: 0.75rem;
+}
+
+/* ── Speed Up button ──────────────────────────────────── */
+.btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 36px;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #fff;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  box-shadow:
+    0 4px 20px rgba(99, 102, 241, 0.45),
+    0 1px 0 rgba(255,255,255,0.15) inset;
+  transition:
+    transform        0.15s ease,
+    box-shadow       0.15s ease,
+    background       0.15s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Ripple shimmer on hover */
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg,
+    rgba(255,255,255,0.12) 0%,
+    transparent 60%
+  );
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 32px rgba(99, 102, 241, 0.65),
+    0 1px 0 rgba(255,255,255,0.15) inset;
+}
+
+.btn:hover:not(:disabled)::after { opacity: 1; }
+
+.btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow:
+    0 2px 10px rgba(99, 102, 241, 0.4),
+    0 1px 0 rgba(255,255,255,0.1) inset;
+}
+
+/* Pulse animation when button is clicked */
+@keyframes btn-pulse {
+  0%   { box-shadow: 0 0 0 0   rgba(99, 102, 241, 0.7); }
+  100% { box-shadow: 0 0 0 16px rgba(99, 102, 241, 0); }
+}
+
+.btn:active:not(:disabled) { animation: btn-pulse 0.3s ease-out; }
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btnIcon {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.btnLabel {
+  line-height: 1;
+}
+
+/* ── Hint text ────────────────────────────────────────── */
+.hint {
+  color: #475569;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  text-align: center;
+}
